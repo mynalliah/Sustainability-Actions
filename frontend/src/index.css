@@ -1,0 +1,5 @@
+* { box-sizing: border-box; }
+body { margin: 0; }
+label { font-weight: 600; }
+input, button { padding: 6px 8px; }
+button { cursor: pointer; }
