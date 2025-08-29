@@ -4,7 +4,7 @@ function Row({ item, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({
     action: item.action,
-    date: item.date,       
+    date: item.date,
     points: item.points,
   });
   const [busy, setBusy] = useState(false);
@@ -30,25 +30,32 @@ function Row({ item, onUpdate, onDelete }) {
 
   return (
     <tr>
-      <td>{item.id}</td>
-      <td>
+      <td className="id-cell">{item.id}</td>
+
+      <td className="action-cell">
         {editing ? (
           <input
             value={draft.action}
             onChange={(e) => setDraft({ ...draft, action: e.target.value })}
           />
-        ) : item.action}
+        ) : (
+          item.action
+        )}
       </td>
-      <td>
+
+      <td className="date-cell">
         {editing ? (
           <input
             type="date"
             value={draft.date}
             onChange={(e) => setDraft({ ...draft, date: e.target.value })}
           />
-        ) : item.date}
+        ) : (
+          item.date
+        )}
       </td>
-      <td>
+
+      <td className="points-cell">
         {editing ? (
           <input
             type="number"
@@ -56,21 +63,36 @@ function Row({ item, onUpdate, onDelete }) {
             onChange={(e) => setDraft({ ...draft, points: e.target.value })}
             min={0}
           />
-        ) : item.points}
+        ) : (
+          item.points
+        )}
       </td>
-      <td style={{ whiteSpace:"nowrap" }}>
+
+      <td className="actions-cell" style={{ whiteSpace: "nowrap" }}>
         {editing ? (
           <>
             <button onClick={save} disabled={busy}>Save</button>{" "}
-            <button onClick={() => { setEditing(false); setDraft(item); }} disabled={busy}>Cancel</button>
+            <button
+              onClick={() => {
+                setEditing(false);
+                setDraft(item);
+              }}
+              disabled={busy}
+            >
+              Cancel
+            </button>
           </>
         ) : (
           <>
             <button onClick={() => setEditing(true)}>Edit</button>{" "}
-            <button onClick={() => onDelete(item.id)} style={{ color:"crimson" }}>Delete</button>
+            <button onClick={() => onDelete(item.id)} style={{ color: "crimson" }}>
+              Delete
+            </button>
           </>
         )}
-        <div style={{ color:"crimson", fontSize:12 }}>{err ? String(err) : ""}</div>
+        <div style={{ color: "crimson", fontSize: 12 }}>
+          {err ? String(err) : ""}
+        </div>
       </td>
     </tr>
   );
@@ -78,17 +100,31 @@ function Row({ item, onUpdate, onDelete }) {
 
 export default function ActionTable({ items, onUpdate, onDelete }) {
   return (
-    <table border="1" cellPadding="8" cellSpacing="0" style={{ width:"100%", maxWidth:800 }}>
+    <table
+      className="actions-table"
+      border="1"
+      cellPadding="8"
+      cellSpacing="0"
+      style={{ width: "100%", maxWidth: 800 }}
+    >
       <thead>
         <tr>
-          <th>ID</th><th>Action</th><th>Date</th><th>Points</th><th>Actions</th>
+          <th>ID</th>
+          <th>Action</th>
+          <th>Date</th>
+          <th>Points</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {items.length === 0 ? (
-          <tr><td colSpan="5" style={{ textAlign:"center" }}>No actions yet</td></tr>
+          <tr>
+            <td colSpan="5" style={{ textAlign: "center" }}>
+              No actions yet
+            </td>
+          </tr>
         ) : (
-          items.map(a => (
+          items.map((a) => (
             <Row key={a.id} item={a} onUpdate={onUpdate} onDelete={onDelete} />
           ))
         )}
@@ -96,3 +132,4 @@ export default function ActionTable({ items, onUpdate, onDelete }) {
     </table>
   );
 }
+

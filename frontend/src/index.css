@@ -1,5 +1,7 @@
-* { box-sizing: border-box; }
-body { margin: 0; }
-label { font-weight: 600; }
-input, button { padding: 6px 8px; }
-button { cursor: pointer; }
+.actions-table { border-collapse: collapse; }
+.actions-table th, .actions-table td { padding: 8px 12px; }
+
+/* Align the columns */
+.actions-table .date-cell { text-align: center; }
+.actions-table .points-cell { text-align: right; }
+.actions-table .points-cell input { text-align: right; width: 100%; }
