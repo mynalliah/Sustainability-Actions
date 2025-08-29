@@ -7,7 +7,7 @@ from typing import List, Dict, Optional
 DATA_PATH = Path(__file__).resolve().parent / "data.json"
 
 #calls to avoid FileNotFoundError if data.json doesn't exist, creates an empty list
-def _ensure_file() --> None:
+def _ensure_file() -> None:
     """Create an empty JSON array file if missing."""
     if not DATA_PATH.exists():
         DATA_PATH.write_text("[]", encoding="utf-8")
