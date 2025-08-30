@@ -1,7 +1,19 @@
+// Renders a table of sustainability actions with inline Edit/Save/Delete.
+// Each row can be switched into "editing" mode to update Action/Date/Points.
+// The table uses CSS class hooks (e.g., .date-cell, .points-cell)
+
+/*
+  Expected props:
+    - items: Array<{ id: number, action: string, date: "YYYY-MM-DD", points: number }>
+    - onUpdate: (id: number, payload: Partial<{action,date,points}>) => Promise<updatedItem>
+    - onDelete: (id: number) => Promise<boolean>
+*/
+
 import { useState } from "react";
 
 function Row({ item, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false);
+  // Local draft copy of the row while editing; initialized from the current item
   const [draft, setDraft] = useState({
     action: item.action,
     date: item.date,
@@ -30,8 +42,10 @@ function Row({ item, onUpdate, onDelete }) {
 
   return (
     <tr>
+      {/* Simple ID cell; handy for debugging and selecting individual records */}
       <td className="id-cell">{item.id}</td>
 
+      {/* Action cell: text in view mode, input in edit mode */}
       <td className="action-cell">
         {editing ? (
           <input
@@ -42,7 +56,8 @@ function Row({ item, onUpdate, onDelete }) {
           item.action
         )}
       </td>
-
+      
+      {/* Action cell: text in view mode, input in edit mode */}
       <td className="date-cell">
         {editing ? (
           <input

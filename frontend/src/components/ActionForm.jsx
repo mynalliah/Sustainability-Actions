@@ -1,16 +1,23 @@
-// src/components/ActionForm.jsx
+// Renders the "Add Action" form and  "Refresh List" button.
+// - `onCreate(payload)` is called to create a new action via the parent.
+// - `onRefresh()` is optionally called to re-fetch the latest actions from the backend
+//   (useful if the JSON file changed on the server and you want to pull without reloading the page).
 import { useState } from "react";
 
 export default function ActionForm({ onCreate }) {
+  // Local form state for controlled inputs
   const [form, setForm] = useState({ action: "", date: "", points: "" });
+  // UI state: submitting flag + error message
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // Keep inputs in sync with state
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   };
 
+  // Submit handler -> validate -> call parent `onCreate` -> reset form
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -21,6 +28,8 @@ export default function ActionForm({ onCreate }) {
         date: form.date,
         points: Number(form.points),
       };
+
+      // Minimal client-side validation (server/serializer will also validate)
       if (!payload.action) throw new Error("Action is required.");
       if (!payload.date) throw new Error("Date is required.");
       if (Number.isNaN(payload.points)) throw new Error("Points must be a number.");

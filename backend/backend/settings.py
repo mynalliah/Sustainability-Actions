@@ -66,8 +66,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-# We are NOT using a DB for actions per assignment (JSON file storage),
-# but Django still needs a DB for its own internals (sqlite default is fine)
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -92,5 +91,5 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
-# Or permissive in dev:
+
 # CORS_ALLOW_ALL_ORIGINS = True

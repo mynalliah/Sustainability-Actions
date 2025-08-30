@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-# Create your tests here.
 # actions/tests.py
 from django.test import TestCase
 from rest_framework.test import APIClient

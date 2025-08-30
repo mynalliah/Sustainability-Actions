@@ -1,3 +1,6 @@
+// Tests for the <App /> component.
+// Render the full UI, but mock the service layer so no real HTTP calls happen.
+// Verify: initial load/empty state, creating an action, editing, and deleting.
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "../App";
@@ -17,9 +20,14 @@ import {
   deleteAction,
 } from "../services/api";
 
+// convenience helper for number/date/text
 function typeIn(el, value) {
-  // convenience helper for number/date/text
   return userEvent.clear(el).then(() => userEvent.type(el, String(value)));
+}
+
+// find the <tr> that contains a given action label
+function rowByActionText(actionText) {
+  return screen.getByText(actionText).closest("tr");
 }
 
 describe("<App /> integration", () => {
@@ -66,16 +74,17 @@ describe("<App /> integration", () => {
     await typeIn(pointsInput, "25");
     await userEvent.click(addBtn);
 
-    // Row appears with created content
+    // Called with correct payload
     expect(createAction).toHaveBeenCalledWith({
       action: "Recycling",
       date: "2025-01-08",
       points: 25,
     });
 
-    // Wait for row to show up
+    // Assert within the created row (avoid matching the header total)
     await screen.findByText("Recycling");
-    expect(screen.getByText("25")).toBeInTheDocument();
+    const row = rowByActionText("Recycling");
+    expect(within(row).getByText("25")).toBeInTheDocument();
   });
 
   test("edits and deletes a row", async () => {
@@ -89,7 +98,7 @@ describe("<App /> integration", () => {
     await screen.findByText("Composting");
 
     // Edit points to 30
-    const row = screen.getByText("Composting").closest("tr");
+    let row = rowByActionText("Composting");
     const editBtn = within(row).getByRole("button", { name: /edit/i });
     await userEvent.click(editBtn);
 
@@ -111,7 +120,10 @@ describe("<App /> integration", () => {
       date: "2025-01-10",
       points: 30,
     });
-    await screen.findByText("30"); // updated value present
+
+    // Re-grab the row (or keep the old reference; both work here)
+    row = rowByActionText("Composting");
+    await within(row).findByText("30"); // updated value present in the row (not the header)
 
     // Delete the row
     deleteAction.mockResolvedValueOnce(true);

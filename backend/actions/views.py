@@ -1,10 +1,8 @@
 from django.shortcuts import render
-# Create your views here.
 from typing import Any, Dict
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
 from .serializers import ActionSerializer
 from .utils import read_actions, write_actions, next_id, find_action
 from datetime import date
@@ -16,7 +14,7 @@ def _to_storage(d: dict) -> dict:
         out["date"] = out["date"].isoformat()  # 'YYYY-MM-DD'
     return out
 
-#maps HTTP methods to behavior and implements the exact endpoints
+# maps HTTP methods to behavior and implements the exact endpoints
 class ActionList(APIView):
     """
     GET /api/actions/ -> list all actions
@@ -24,16 +22,16 @@ class ActionList(APIView):
     """
     def get(self, request):
         """
-        Reads th entire list from data.json via read_actions and returns is as a JSON
+        Reads the entire list from data.json via read_actions and returns is as a JSON
 
-        Retrieve a list of all sustainability actions.
+        Retrieves a list of all sustainability actions.
         """
         items = read_actions()
         return Response(items, status=status.HTTP_200_OK)
     
     def post(self, request):
         """
-        validates body with ActionSerializer and appends to in-memory list
+        Validates body with ActionSerializer and appends to in-memory list
 
         Add a new sustainability action
         """
@@ -54,7 +52,7 @@ class ActionDetail(APIView):
     
     def get_object(self, action_id: int):
         """
-        returns a single record of 404 if it doesn't exist
+        Returns a single record of 404 if it doesn't exist
         """
         items = read_actions()
         item = find_action(items, action_id)
@@ -62,7 +60,7 @@ class ActionDetail(APIView):
     
     def get(self, request, action_id: int):
         """
-        returns a single record or 404 if it doesn't exist
+        Returns a single record or 404 if it doesn't exist
         """
         items, item = self.get_object(action_id)
         if item is None:
@@ -71,11 +69,12 @@ class ActionDetail(APIView):
 
     def put(self, request, action_id: int):
         """
-        client must send all fields except id
+        Client must send all fields except id
         """
         items, item = self.get_object(action_id)
         if item is None:
             return Response({"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
+        
         # full update requires all fields
         serializer = ActionSerializer(data=request.data)
         if not serializer.is_valid():
@@ -91,7 +90,7 @@ class ActionDetail(APIView):
 
     def patch(self, request, action_id: int):
         """
-        only changed fields are required we merge into original item and write back
+        Only changed fields are required we merge into original item and write back
         """
         items, item = self.get_object(action_id)
         if item is None:
@@ -111,7 +110,7 @@ class ActionDetail(APIView):
 
     def delete(self, request, action_id: int):
         """
-        removes the items and saves
+        Removes the items and saves
         """
         items, item = self.get_object(action_id)
         if item is None:

@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import ActionList, ActionDetail
 
-#wiring URL routes for the actions app so views are reachable at the exact paths
+# Wiring URL routes for the actions app so views are reachable at the exact paths
 #/api/actions for list + create
 #/api/actions/<id> for update + delete
 
