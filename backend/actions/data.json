@@ -1,8 +1,32 @@
 [
   {
-    "action": "Recycling",
-    "date": "2025-01-08",
-    "points": 25,
+    "action": "recycling",
+    "date": "2025-08-05",
+    "points": 3,
     "id": 1
+  },
+  {
+    "action": "conserve water",
+    "date": "2025-08-28",
+    "points": 39,
+    "id": 2
+  },
+  {
+    "action": "turn off the lights",
+    "date": "2025-08-30",
+    "points": 4,
+    "id": 3
+  },
+  {
+    "action": "recycling",
+    "date": "2025-08-29",
+    "points": 3,
+    "id": 4
+  },
+  {
+    "action": "conserve water",
+    "date": "2025-08-05",
+    "points": 45,
+    "id": 5
   }
 ]

@@ -24,7 +24,7 @@ class ActionList(APIView):
     """
     def get(self, request):
         """
-        Reads teh entire list from data.json via read_actions and returns is as a JSON
+        Reads th entire list from data.json via read_actions and returns is as a JSON
 
         Retrieve a list of all sustainability actions.
         """
