@@ -28,7 +28,6 @@ export default function Modal({ open, onClose, title, children, footer }) {
             onClick={onClose}
             title="Close"
           >
-            ×
           </button>
         </header>
         <div className="modal-body">{children}</div>
