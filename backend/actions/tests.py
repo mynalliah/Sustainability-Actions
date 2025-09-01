@@ -153,7 +153,6 @@ class ActionsAPITest(TestCase):
         r = self.client.post(reverse("action-list"), {}, format="json")
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         errors = r.json()
-        # All required fields should be present in error response
         self.assertIn("action", errors)
         self.assertIn("date", errors)
         self.assertIn("points", errors)
@@ -163,5 +162,40 @@ class ActionsAPITest(TestCase):
         r = self.client.get(reverse("action-list"))
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         self.assertEqual(r.json(), [])
+
+    def test_action_max_length(self):
+        """`action` must be ≤ 255 chars: 255 OK, 256 rejected with 400 + field error."""
+
+        # 255 characters -> should succeed (201)
+        ok_action = "a" * 255
+        r_ok = self.client.post(
+            reverse("action-list"),
+            {"action": ok_action, "date": "2025-04-01", "points": 1},
+            format="json",
+        )
+        self.assertEqual(
+            r_ok.status_code, status.HTTP_201_CREATED,
+            "Expected 201 Created for 255-char action"
+        )
+
+        # 256 characters -> should fail (400) with an error on 'action'
+        too_long_action = "a" * 256
+        r_bad = self.client.post(
+            reverse("action-list"),
+            {"action": too_long_action, "date": "2025-04-01", "points": 1},
+            format="json",
+        )
+        self.assertEqual(
+            r_bad.status_code, status.HTTP_400_BAD_REQUEST,
+            "Expected 400 for action longer than 255 chars"
+        )
+
+        errors = r_bad.json()
+        self.assertIn("action", errors, "Expected 'action' field error for too-long value")
+
+        msg = errors["action"]
+        if isinstance(msg, list):
+            msg = " ".join(str(m) for m in msg)
+        self.assertIn("255", msg, "Error message should reference the 255-char limit")
 
         
