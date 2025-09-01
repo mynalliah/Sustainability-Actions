@@ -1,11 +1,12 @@
-// Tests for the <App /> component.
-// Render the full UI, but mock the service layer so no real HTTP calls happen.
-// Verify: initial load/empty state, creating an action, editing, and deleting.
+// Integration tests for the <App /> component.
+//   1) Initial load shows a "Loading…" indicator and then an empty state.
+//   2) Creating a new action via the form adds a row to the table.
+//   3) Editing an existing row updates the value; deleting removes the row.
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "../App";
 
-// Mock the API layer (src/services/api.js)
+// Mock the API layer
 jest.mock("../services/api", () => ({
   getActions: jest.fn(),
   createAction: jest.fn(),
@@ -68,20 +69,18 @@ describe("<App /> integration", () => {
     createAction.mockResolvedValueOnce(created);
 
     await typeIn(actionInput, "Recycling");
-    // NOTE: input type=date needs yyyy-mm-dd
     await userEvent.clear(dateInput);
     await userEvent.type(dateInput, "2025-01-08");
     await typeIn(pointsInput, "25");
     await userEvent.click(addBtn);
 
-    // Called with correct payload
     expect(createAction).toHaveBeenCalledWith({
       action: "Recycling",
       date: "2025-01-08",
       points: 25,
     });
 
-    // Assert within the created row (avoid matching the header total)
+    // Assert within the created row 
     await screen.findByText("Recycling");
     const row = rowByActionText("Recycling");
     expect(within(row).getByText("25")).toBeInTheDocument();
@@ -94,15 +93,13 @@ describe("<App /> integration", () => {
     getActions.mockResolvedValueOnce(initial);
     render(<App />);
 
-    // Wait for initial load
     await screen.findByText("Composting");
 
-    // Edit points to 30
     let row = rowByActionText("Composting");
     const editBtn = within(row).getByRole("button", { name: /edit/i });
     await userEvent.click(editBtn);
 
-    const pointsInput = within(row).getByDisplayValue("10"); // input now visible
+    const pointsInput = within(row).getByDisplayValue("10"); 
     updateAction.mockResolvedValueOnce({
       id: 1,
       action: "Composting",
@@ -121,11 +118,9 @@ describe("<App /> integration", () => {
       points: 30,
     });
 
-    // Re-grab the row (or keep the old reference; both work here)
     row = rowByActionText("Composting");
-    await within(row).findByText("30"); // updated value present in the row (not the header)
+    await within(row).findByText("30"); 
 
-    // Delete the row
     deleteAction.mockResolvedValueOnce(true);
     const deleteBtn = within(row).getByRole("button", { name: /delete/i });
     await userEvent.click(deleteBtn);

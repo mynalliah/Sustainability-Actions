@@ -13,14 +13,23 @@ import {
   updateAction,
   deleteAction,
 } from "./services/api";
-import ActionForm from "./components/ActionForm";
 import ActionTable from "./components/ActionTable";
+import AddActionModal from "./components/AddActionModal";
 
 export default function App() {
+  // Local UI state
+
+  // Load list of actions
   const [actions, setActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
+  // Data loading 
+
+  /**
+   * Fetch the latest actions from the backend and populate local state.
+   */
   const load = async () => {
     setLoading(true);
     setError("");
@@ -36,28 +45,43 @@ export default function App() {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); 
 
+  // CRUD handlers 
+
+  /**
+   * Create a new action via API, then append it to local state.
+   */
   const handleCreate = async (payload) => {
     const created = await createAction(payload);
     setActions((prev) => [...prev, created]);
   };
 
+  /**
+   * Update an existing action; replace it in local state using the server response.
+   */
   const handleUpdate = async (id, payload) => {
     const updated = await updateAction(id, payload);
     setActions((prev) => prev.map((a) => (a.id === id ? updated : a)));
   };
 
+  /**
+   * Delete an action by id; remove it from local state when API confirms success.
+   */
   const handleDelete = async (id) => {
     const ok = await deleteAction(id);
     if (ok) setActions((prev) => prev.filter((a) => a.id !== id));
   };
 
+  // Derived values 
+
+  // Compute the total points across all actions; 
   const totalPoints = actions.reduce(
     (sum, a) => sum + (Number.isFinite(+a.points) ? +a.points : 0),
     0
   );
+
+  // Render 
 
   return (
     <div
@@ -68,39 +92,57 @@ export default function App() {
         margin: "0 auto",
       }}
     >
+      {/* Page header with a small summary and primary actions */}
       <header style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
         <h1 style={{ margin: 0 }}>Sustainability Actions</h1>
+
+        {/* Simple summary: item count + total points */}
         <span style={{ color: "#555" }}>
           {actions.length} item{actions.length === 1 ? "" : "s"} • Total points:{" "}
           <strong>{totalPoints}</strong>
         </span>
-        <div style={{ marginLeft: "auto" }}>
+
+        {/* Right-aligned actions */}
+        <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+          <button
+            onClick={() => setIsAddOpen(true)}
+            className="btn btn-primary"
+            title="Add a new action"
+          >
+            Add Action
+          </button>
           <button
             onClick={load}
+            className="btn btn-secondary"
             title="Fetch the latest data from the server"
-            style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #ccc" }}
           >
             Refresh
           </button>
         </div>
       </header>
 
-      <section style={{ marginTop: 20, marginBottom: 24 }}>
-        <h2 style={{ marginTop: 0 }}>Add Action</h2>
-        {/* Pass load() so ActionForm's "Refresh List" button works */}
-        <ActionForm onCreate={handleCreate} onRefresh={load} />
-      </section>
-
-      <section>
+      {/* Table + loading/error indicators */}
+      <section style={{ marginTop: 20 }}>
         <h2 style={{ marginTop: 0 }}>Actions</h2>
+
+        {/* Basic async states */}
         {loading ? <div>Loading…</div> : null}
         {error ? <div style={{ color: "crimson" }}>{error}</div> : null}
+
+        {/* Data table */}
         <ActionTable
           items={actions}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
         />
       </section>
+
+      {/* Add Action Modal: shown when user clicks "Add Action". */}
+      <AddActionModal
+        open={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        onCreate={handleCreate}
+      />
     </div>
   );
 }
